@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { IsEmail, IsOptional, IsString, Matches, MinLength, ValidateIf } from 'class-validator';
 
 export class RegisterUserDto {
@@ -10,7 +11,7 @@ export class RegisterUserDto {
   email?: string;
 
   @IsOptional()
-  @IsEmail()
+  @IsString()
   @ValidateIf((o) => o.phone != '')
   phone?: string;
 
