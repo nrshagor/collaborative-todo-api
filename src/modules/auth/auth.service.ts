@@ -4,7 +4,6 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { RegisterUserDto } from '../users/dto/register-user.dto';
 import { UsersService } from '../users/users.service';
@@ -23,6 +22,7 @@ export class AuthService {
     }
     try {
       const newUser = await this.usersServices.createUser(registerDto);
+
       return { newUser, message: 'User Successfully Register' };
     } catch (error) {
       if (/(email)[\s\S]+(already exists)/.test(error.detail)) {
@@ -43,7 +43,6 @@ export class AuthService {
       throw new UnauthorizedException('Incorrect password');
     }
 
-    // If all checks pass, return the user object excluding the password
     const { password: _, ...result } = user;
     return result;
   }
