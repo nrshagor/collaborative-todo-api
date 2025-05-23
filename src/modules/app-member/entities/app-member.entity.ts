@@ -9,9 +9,14 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-
+export enum AppMemberRole {
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  EDITOR = 'editor',
+  VIEWER = 'viewer',
+}
 @Entity('app_members')
-@Unique(['user', 'todoApp'])
+// @Unique(['user', 'todoApp'])
 export class AppMember {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -24,10 +29,10 @@ export class AppMember {
 
   @Column({
     type: 'enum',
-    enum: ['viewer', 'editor', 'owner'],
-    default: 'viewer',
+    enum: AppMemberRole,
+    default: AppMemberRole.VIEWER,
   })
-  role: 'viewer' | 'editor' | 'owner';
+  role: AppMemberRole;
 
   @CreateDateColumn()
   invited_at: Date;

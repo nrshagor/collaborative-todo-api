@@ -1,34 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Get, Param } from '@nestjs/common';
 import { AppMemberService } from './app-member.service';
 import { CreateAppMemberDto } from './dto/create-app-member.dto';
-import { UpdateAppMemberDto } from './dto/update-app-member.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Request } from 'express';
 
-@Controller('app-member')
+@Controller('app-members')
+@UseGuards(JwtAuthGuard)
 export class AppMemberController {
   constructor(private readonly appMemberService: AppMemberService) {}
 
   @Post()
-  create(@Body() createAppMemberDto: CreateAppMemberDto) {
-    return this.appMemberService.create(createAppMemberDto);
+  async invite(@Body() dto: CreateAppMemberDto, @Req() req) {
+    const user = req.user.userId;
+    return this.appMemberService.create(dto, user);
   }
 
-  @Get()
-  findAll() {
-    return this.appMemberService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.appMemberService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAppMemberDto: UpdateAppMemberDto) {
-    return this.appMemberService.update(+id, updateAppMemberDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.appMemberService.remove(+id);
+  @Get(':appId')
+  async findAll(@Param('appId') appId: string) {
+    return this.appMemberService.findAllForApp(appId);
   }
 }
