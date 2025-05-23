@@ -4,7 +4,6 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { RegisterUserDto } from '../users/dto/register-user.dto';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
@@ -49,12 +48,7 @@ export class AuthService {
 
   async login(user: any) {
     const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-      phone: user.phone,
-      emailVerified: user.isEmailVerified,
-      phoneVerified: user.isPhoneVerified,
+      id: user.id,
     };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '1d' }); // Access token expires in 15 minutes
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' }); // Refresh token expires in 7 days
@@ -63,21 +57,5 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
-  }
-
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
   }
 }

@@ -1,31 +1,32 @@
 import { AppMember } from 'src/modules/app-member/entities/app-member.entity';
 import { Task } from 'src/modules/task/entities/task.entity';
-import { ToDoApp } from 'src/modules/to-do-app/entities/to-do-app.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity()
-export class User {
+@Entity('todo_apps')
+export class ToDoApp {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column()
   name: string;
 
-  @Column({ unique: true, nullable: true })
-  email: string;
+  @ManyToOne(() => User, (user) => user.owned_apps, { onDelete: 'CASCADE' })
+  owner: User;
 
-  @Column({ type: 'varchar', nullable: true })
-  phone: string;
+  @OneToMany(() => Task, (task) => task.todoApp)
+  tasks: Task[];
 
-  @Column({ type: 'varchar', nullable: false })
-  password: string;
+  @OneToMany(() => AppMember, (member) => member.todoApp)
+  members: AppMember[];
 
   @CreateDateColumn({
     type: 'timestamp',
@@ -39,14 +40,4 @@ export class User {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   public updated_at: Date;
-
-  // Relations
-  @OneToMany(() => ToDoApp, (todoApp) => todoApp.owner)
-  owned_apps: ToDoApp[];
-
-  @OneToMany(() => AppMember, (member) => member.user)
-  memberships: AppMember[];
-
-  @OneToMany(() => Task, (task) => task.created_by)
-  created_tasks: Task[];
 }
