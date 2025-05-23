@@ -7,13 +7,19 @@ import * as bcrypt from 'bcryptjs';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private usersRepository: Repository<User>
   ) {}
 
   async createUser(registerDto) {
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-    const user = this.userRepository.create({ ...registerDto, password: hashedPassword });
-    return this.userRepository.save(user);
+    const user = this.usersRepository.create({ ...registerDto, password: hashedPassword });
+    return this.usersRepository.save(user);
+  }
+
+  async findByEmailOrPhone(identifier: string): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: [{ email: identifier }, { phone: identifier }],
+    });
   }
 
   findAll() {
