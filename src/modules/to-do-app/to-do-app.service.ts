@@ -1,11 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { CreateToDoAppDto } from './dto/create-to-do-app.dto';
 import { UpdateToDoAppDto } from './dto/update-to-do-app.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ToDoApp } from './entities/to-do-app.entity';
+import { Repository } from 'typeorm';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class ToDoAppService {
-  create(createToDoAppDto: CreateToDoAppDto) {
-    return 'This action adds a new toDoApp';
+  constructor(
+    @InjectRepository(ToDoApp)
+    private readonly appRepo: Repository<ToDoApp>
+  ) {}
+  async create(createToDoAppDto: CreateToDoAppDto, owner: User) {
+    const newApp = this.appRepo.create({
+      ...createToDoAppDto,
+      owner,
+    });
+    return await this.appRepo.save(newApp);
   }
 
   findAll() {
