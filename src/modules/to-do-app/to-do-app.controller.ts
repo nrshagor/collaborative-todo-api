@@ -17,13 +17,14 @@ export class ToDoAppController {
   }
 
   @Get()
-  findAll() {
-    return this.toDoAppService.findAll();
+  findAll(@Req() req) {
+    const userId = req.user.userId;
+    return this.toDoAppService.findAll(userId);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.toDoAppService.findOne(+id);
+    return this.toDoAppService.findOne(id);
   }
 
   @Patch(':id')
@@ -32,7 +33,8 @@ export class ToDoAppController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.toDoAppService.remove(+id);
+  remove(@Param('id') id: string, @Req() req) {
+    const userId = req.user.userId;
+    return this.toDoAppService.remove(id, userId);
   }
 }

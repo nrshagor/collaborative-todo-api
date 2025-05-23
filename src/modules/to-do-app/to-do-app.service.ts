@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateToDoAppDto } from './dto/create-to-do-app.dto';
 import { UpdateToDoAppDto } from './dto/update-to-do-app.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,19 +20,30 @@ export class ToDoAppService {
     return await this.appRepo.save(newApp);
   }
 
-  findAll() {
-    return `This action returns all toDoApp`;
+  async findAll(userId) {
+    return this.appRepo
+      .createQueryBuilder('app')
+      .leftJoinAndSelect('app.owner', 'owner')
+      .where('owner.id = :userId', { userId: userId })
+      .getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} toDoApp`;
+  async findOne(id: string) {
+    const app = await this.appRepo.findOne({
+      where: { id },
+      relations: ['owner', 'members'],
+    });
+    if (!app) throw new NotFoundException('ToDo App not found');
+    return app;
   }
 
   update(id: number, updateToDoAppDto: UpdateToDoAppDto) {
     return `This action updates a #${id} toDoApp`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} toDoApp`;
+  async remove(id: string, userId) {
+    const app = await this.findOne(id);
+    if (app.owner.id !== userId) throw new Error('Only owner can delete app');
+    await this.appRepo.remove(app);
   }
 }
