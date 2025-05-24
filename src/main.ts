@@ -8,7 +8,7 @@ async function bootstrap() {
 
   // Enable CORS with specific configuration
   app.enableCors({
-    origin: ['http://localhost:3000'], // Frontend origin
+    origin: ['http://localhost:3000', 'https://collaborative-todo-dusky.vercel.app/'], // Frontend origin
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
