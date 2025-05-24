@@ -6,6 +6,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { ToDoApp } from '../to-do-app/entities/to-do-app.entity';
 import { AppMember, AppMemberRole } from '../app-member/entities/app-member.entity';
 import { User } from '../users/entities/user.entity';
+import { UpdateTaskDto } from './dto/update-task.dto';
 
 @Injectable()
 export class TaskService {
@@ -67,5 +68,53 @@ export class TaskService {
       where: { todoApp: { id: appId } },
       relations: ['created_by'],
     });
+  }
+  async update(id: string, updateTaskDto: UpdateTaskDto, user: User) {
+    const task = await this.taskRepo.findOne({
+      where: { id },
+      relations: ['todoApp'],
+    });
+
+    if (!task) throw new NotFoundException('Task not found');
+
+    const membership = await this.appMemberRepo.findOne({
+      where: {
+        todoApp: { id: task.todoApp.id },
+        user: { id: user.id },
+      },
+    });
+
+    const allowedRoles = [AppMemberRole.OWNER, AppMemberRole.ADMIN, AppMemberRole.EDITOR];
+
+    if (!membership || !allowedRoles.includes(membership.role)) {
+      throw new ForbiddenException('You are not allowed to update tasks');
+    }
+
+    Object.assign(task, updateTaskDto);
+    return this.taskRepo.save(task);
+  }
+
+  async remove(id: string, user: User) {
+    const task = await this.taskRepo.findOne({
+      where: { id },
+      relations: ['todoApp'],
+    });
+
+    if (!task) throw new NotFoundException('Task not found');
+
+    const membership = await this.appMemberRepo.findOne({
+      where: {
+        todoApp: { id: task.todoApp.id },
+        user: { id: user.id },
+      },
+    });
+
+    const allowedRoles = [AppMemberRole.OWNER, AppMemberRole.ADMIN];
+
+    if (!membership || !allowedRoles.includes(membership.role)) {
+      throw new ForbiddenException('You are not allowed to delete tasks');
+    }
+
+    return this.taskRepo.remove(task);
   }
 }

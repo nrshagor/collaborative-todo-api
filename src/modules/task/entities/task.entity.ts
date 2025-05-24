@@ -25,10 +25,10 @@ export class Task {
 
   @Column({
     type: 'enum',
-    enum: ['in-progress', 'stale', 'completed'],
-    default: 'in-progress',
+    enum: ['todo', 'in-progress', 'stale', 'completed'],
+    default: 'todo',
   })
-  status: 'in-progress' | 'stale' | 'completed';
+  status: 'todo' | 'in-progress' | 'stale' | 'completed';
 
   @Column({ nullable: true, type: 'date' })
   due_date?: Date;
