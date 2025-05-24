@@ -16,7 +16,8 @@ export class TaskController {
   }
 
   @Get()
-  async findAll(@Query('appId') appId: string) {
-    return this.taskService.findAll(appId);
+  async findAll(@Query('appId') appId: string, @Req() req: Request) {
+    const user = req.user as any;
+    return this.taskService.findAll(appId, user);
   }
 }

@@ -44,7 +44,25 @@ export class TaskService {
     return await this.taskRepo.save(newTask);
   }
 
-  async findAll(appId: string) {
+  async findAll(appId: string, user: User) {
+    const membership = await this.appMemberRepo.findOne({
+      where: {
+        todoApp: { id: appId },
+        user: { id: user.id },
+      },
+    });
+
+    const allowedRoles = [
+      AppMemberRole.OWNER,
+      AppMemberRole.ADMIN,
+      AppMemberRole.EDITOR,
+      AppMemberRole.VIEWER,
+    ];
+
+    if (!membership || !allowedRoles.includes(membership.role)) {
+      throw new ForbiddenException('You are not allowed to view tasks');
+    }
+
     return this.taskRepo.find({
       where: { todoApp: { id: appId } },
       relations: ['created_by'],
