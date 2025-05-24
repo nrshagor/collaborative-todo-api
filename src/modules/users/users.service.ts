@@ -22,8 +22,10 @@ export class UsersService {
     });
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    return this.usersRepository.find({
+      select: ['id', 'email', 'name'], // or any minimal fields needed
+    });
   }
 
   findOne(id: number) {
